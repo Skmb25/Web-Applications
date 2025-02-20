@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Search App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pokémon Search</h1>
+        <div class="search-container">
+            <input type="text" id="search-input" required placeholder="Enter Pokémon name or ID">
+            <button id="search-button">Search</button>
+        </div>
+
+        <div class="pokemon-container">
+            <div id="pokemon-name"></div>
+            <div id="pokemon-id"></div>
+            <div id="sprite-container"></div>
+            <div id="weight"></div>
+            <div id="height"></div>
+            <div id="types"></div>
+            <div id="hp"></div>
+            <div id="attack"></div>
+            <div id="defense"></div>
+            <div id="special-attack"></div>
+            <div id="special-defense"></div>
+            <div id="speed"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+CSS
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+#search-input {
+    padding: 10px;
+    width: 200px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#search-button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#search-button:hover {
+    background-color: #45a049;
+}
+
+.pokemon-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#sprite-container img {
+    width: 100px;
+    height: 100px;
+}
+
+#types span {
+    display: inline-block;
+    margin: 5px;
+    padding: 5px 10px;
+    background-color: #666;
+    color: white;
+    border-radius: 15px;
+}
+JS
+document.addEventListener('DOMContentLoaded', () => {
+    const searchButton = document.getElementById('search-button');
+    const searchInput = document.getElementById('search-input');
+    const apiUrl = 'https://pokeapi-proxy.freecodecamp.rocks/api/pokemon';
+
+    searchButton.addEventListener('click', async () => {
+        const query = searchInput.value.trim().toLowerCase();
+        if (!query) {
+            alert('Please enter a Pokémon name or ID.');
+            return;
+        }
+
+        clearDisplay();
+        showLoading();
+
+        try {
+            const response = await fetch(`${apiUrl}/${query}`);
+            if (!response.ok) {
+                throw new Error('Pokémon not found');
+            }
+            const data = await response.json();
+            displayPokemon(data);
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            hideLoading();
+        }
+    });
+
+    function displayPokemon(pokemon) {
+        document.getElementById('pokemon-name').textContent = pokemon.name.toUpperCase();
+        document.getElementById('pokemon-id').textContent = `#${pokemon.id}`;
+        document.getElementById('weight').textContent = `Weight: ${pokemon.weight}`;
+        document.getElementById('height').textContent = `Height: ${pokemon.height}`;
+
+        // Add sprite
+        const spriteContainer = document.getElementById('sprite-container');
+        spriteContainer.innerHTML = '';
+        const sprite = document.createElement('img');
+        sprite.id = 'sprite';
+        sprite.src = pokemon.sprites.front_default;
+        sprite.alt = pokemon.name;
+        spriteContainer.appendChild(sprite);
+
+        // Display types
+        const typesElement = document.getElementById('types');
+        typesElement.innerHTML = '';
+        pokemon.types.forEach(type => {
+            const typeSpan = document.createElement('span');
+            typeSpan.textContent = type.type.name.toUpperCase();
+            typesElement.appendChild(typeSpan);
+        });
+
+        // Display stats
+        document.getElementById('hp').textContent = pokemon.stats[0].base_stat;
+        document.getElementById('attack').textContent = pokemon.stats[1].base_stat;
+        document.getElementById('defense').textContent = pokemon.stats[2].base_stat;
+        document.getElementById('special-attack').textContent = pokemon.stats[3].base_stat;
+        document.getElementById('special-defense').textContent = pokemon.stats[4].base_stat;
+        document.getElementById('speed').textContent = pokemon.stats[5].base_stat;
+    }
+
+    function clearDisplay() {
+        document.getElementById('pokemon-name').textContent = '';
+        document.getElementById('pokemon-id').textContent = '';
+        document.getElementById('weight').textContent = '';
+        document.getElementById('height').textContent = '';
+        document.getElementById('types').innerHTML = '';
+        document.getElementById('hp').textContent = '';
+        document.getElementById('attack').textContent = '';
+        document.getElementById('defense').textContent = '';
+        document.getElementById('special-attack').textContent = '';
+        document.getElementById('special-defense').textContent = '';
+        document.getElementById('speed').textContent = '';
+        document.getElementById('sprite-container').innerHTML = '';
+    }
+
+    function showLoading() {
+        const loading = document.createElement('div');
+        loading.id = 'loading';
+        loading.textContent = 'Loading...';
+        document.querySelector('.pokemon-container').appendChild(loading);
+    }
+
+    function hideLoading() {
+        const loading = document.getElementById('loading');
+        if (loading) loading.remove();
+    }
+});
