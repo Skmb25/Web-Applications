@@ -36,7 +36,9 @@
     <script src="script.js"></script>
   </body>
 </html>
-CSS
+
+
+//CSS
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
@@ -241,7 +243,9 @@ id {
     background-color: #f2dede;
     color: #a94442;
 }
-JS
+
+
+//JS
 const userInput = document.getElementById('user-input');
 const checkBtn = document.getElementById('check-btn');
 const clearBtn = document.getElementById('clear-btn');
